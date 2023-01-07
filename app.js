@@ -7,7 +7,11 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 const { Strategy } = require("passport-google-oauth20");
 
-require("dotenv").config();
+require("dotenv").config({
+  path: __dirname + `/.env.${process.env.NODE_ENV}`,
+  debug: true,
+});
+console.log(process.env.NODE_ENV, __dirname + `/.env.${process.env.NODE_ENV}`);
 
 const app = express();
 

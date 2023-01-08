@@ -2,18 +2,26 @@ const express = require("express");
 const helmet = require("helmet");
 const testRouter = require("./src/routes/test.routes");
 const authRouter = require("./src/routes/auth.routes");
+const v1Router = require("./src/routes/v1.routes");
 const path = require("path");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const { Strategy } = require("passport-google-oauth20");
 
+const startDB = require("./src/config/mongodb.config");
+const errorHandler = require("./src/services/errorHandler.service");
+
 require("dotenv").config({
   path: __dirname + `/.env.${process.env.NODE_ENV}`,
   debug: true,
 });
-console.log(process.env.NODE_ENV, __dirname + `/.env.${process.env.NODE_ENV}`);
+
+// start db
+startDB();
 
 const app = express();
+// parse application/json
+app.use(express.json());
 
 const authConfig = {
   clientID: process.env.GOOGLE_OAUTH2_CLIENT_ID,
@@ -22,7 +30,6 @@ const authConfig = {
 };
 
 function verifyCallback(accessToken, refreshToken, profile, done) {
-  console.log("google profile", profile);
   done(null, profile);
 }
 
@@ -37,10 +44,17 @@ app.use(
 );
 app.use(passport.initialize());
 
+app.use("*", (req, res, next) => {
+  console.log("a request came in");
+  next();
+});
+
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
+app.use("/api/v1", v1Router);
 
 app.use(express.static(path.join(__dirname, "public")));
-app.get("/*", (req, res, next) => {});
+// global error handler
+app.use(errorHandler);
 
 module.exports = app;

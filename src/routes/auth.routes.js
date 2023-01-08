@@ -3,7 +3,6 @@ const passport = require("passport");
 
 const router = express.Router();
 
-router.get("/secret", (req, res) => {});
 router.get("/google", passport.authenticate("google", { scope: ["email"] }));
 
 router.get(

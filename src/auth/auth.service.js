@@ -37,7 +37,7 @@ const signin = async (signinObj) => {
   const { email, password } = signinObj;
   let user = await User.findOne({ email });
   if (!user) {
-    return { err: "This user with this email does not exist", status: 400 };
+    return { err: "This email does not belong to any account", status: 400 };
   }
 
   // compare password

@@ -7,6 +7,7 @@ const path = require("path");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const { Strategy } = require("passport-google-oauth20");
+const cors = require("cors");
 
 const startDB = require("./src/config/mongodb.config");
 const errorHandler = require("./src/services/errorHandler.service");
@@ -43,7 +44,11 @@ app.use(
   })
 );
 app.use(passport.initialize());
-
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use("*", (req, res, next) => {
   console.log("a request came in");
   next();

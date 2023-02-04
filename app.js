@@ -4,9 +4,8 @@ const testRouter = require("./src/routes/test.routes");
 const authRouter = require("./src/routes/auth.routes");
 const v1Router = require("./src/routes/v1.routes");
 const path = require("path");
-const passport = require("passport");
+
 const cookieSession = require("cookie-session");
-const { Strategy } = require("passport-google-oauth20");
 const cors = require("cors");
 
 const startDB = require("./src/config/mongodb.config");
@@ -16,25 +15,24 @@ require("dotenv").config({
   path: __dirname + `/.env.${process.env.NODE_ENV}`,
   debug: true,
 });
+const passport = require("passport");
+const admin = require("firebase-admin");
+
+var serviceAccount = require("./public/the-clout-2ab75-firebase-adminsdk-ct01r-96d94e7ec8.json");
+
+require("./src/config/passportConfig")(passport);
 
 // start db
 startDB();
+
+const fbApp = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const app = express();
 // parse application/json
 app.use(express.json());
 
-const authConfig = {
-  clientID: process.env.GOOGLE_OAUTH2_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_OAUTH2_SECRET,
-  callbackURL: "https://localhost:8000/auth/google/callback",
-};
-
-function verifyCallback(accessToken, refreshToken, profile, done) {
-  done(null, profile);
-}
-
-passport.use(new Strategy(authConfig, verifyCallback));
 app.use(helmet());
 app.use(
   cookieSession({
@@ -43,7 +41,6 @@ app.use(
     keys: [process.env.SESSION_KEY],
   })
 );
-app.use(passport.initialize());
 app.use(
   cors({
     origin: "*",

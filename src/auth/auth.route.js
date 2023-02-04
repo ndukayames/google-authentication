@@ -1,10 +1,18 @@
 const express = require("express");
-const { createUserAccount, signin } = require("./auth.controller");
-const verifyJWT = require("../services/authorization.service");
+const {
+  createUserAccount,
+  signin,
+  socialSignup,
+  verifySocialAuthToken,
+} = require("./auth.controller");
 
 const Router = express.Router();
 
 Router.post("/signup", createUserAccount);
+Router.post("/social-signup", socialSignup);
+
+Router.post("/verify-token", verifySocialAuthToken);
+
 Router.post("/signin", signin);
 
 module.exports = Router;

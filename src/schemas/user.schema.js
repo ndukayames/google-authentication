@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema(
   {
     first_name: String,
     last_name: String,
+    account_type: { type: String, default: "local" }, // facebook, google, local
     email: { type: String, unique: true },
     phone_number: String,
     password: String,
@@ -25,8 +26,11 @@ const userSchema = mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   // hash user password before saving to db
-  console.log("hashing password");
-  this.password = await bcrypt.hash(this.password, 10);
+  if (this.account_type === "local") {
+    console.log("hashing password");
+
+    this.password = await bcrypt.hash(this.password, 10);
+  }
   return next();
 });
 
